@@ -27,11 +27,16 @@
     <ClCompile Include="GameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Headers\TexturedObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="simple.vs" />
     <None Include="simple.fs" />
     <None Include="grayscale.fs" />
+    <None Include="Headers\textureshader.vs" />
+    <None Include="Headers\textureshader.fs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Shader.h">
@@ -47,6 +52,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Headers\Vertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\TexturedObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

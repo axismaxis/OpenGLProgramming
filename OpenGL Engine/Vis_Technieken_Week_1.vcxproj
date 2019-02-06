@@ -82,12 +82,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="Headers\TexturedObject.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="OpenGLEngine.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="grayscale.fs" />
+    <None Include="Headers\textureshader.fs" />
+    <None Include="Headers\textureshader.vs" />
     <None Include="simple.fs" />
     <None Include="simple.vs" />
   </ItemGroup>
@@ -96,6 +99,8 @@
     <ClInclude Include="Headers\GameObject.h" />
     <ClInclude Include="Headers\OpenGLEngine.h" />
     <ClInclude Include="Headers\Shader.h" />
+    <ClInclude Include="Headers\stb_image.h" />
+    <ClInclude Include="Headers\TexturedObject.h" />
     <ClInclude Include="Headers\Vertex.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

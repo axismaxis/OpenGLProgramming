@@ -9,6 +9,7 @@
 #include <Vertex.h>
 #include <GameObject.h>
 #include <vector>
+#include <TexturedObject.h>
 #pragma comment(lib, "glew32.lib")
 
 //Screen size
@@ -17,12 +18,13 @@ glm::ivec2 screenSize;
 //Shaders
 Shader* simpleShader;
 Shader* grayscaleShader;
+Shader* textureShader;
 
 //Timing
 int lastTime;
 
 //Gameobjects
-std::vector<GameObject*> gameObjects;
+std::vector<TexturedObject*> gameObjects;
 
 void checkShaderErrors(GLuint shaderId)
 {
@@ -73,9 +75,17 @@ void init()
 	grayscaleShader->CreateUniform("modelViewProjectionMatrix");
 	grayscaleShader->CreateUniform("time");
 
+	//Create texture shader
+	textureShader = new Shader("textureShader.vs", "textureShader.fs");
+	textureShader->EnableDebug(true);
+	textureShader->Link();
+
+	textureShader->CreateTexture("res/grid.png", "gridTexture");
+	textureShader->CreateUniform("modelViewProjectionMatrix");
+
 	//Create gameobjects
-	GameObject* cube = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f));
-	cube->SetShader(simpleShader);
+	TexturedObject* cube = new TexturedObject(glm::vec3(0.0f, 0.0f, 0.0f));
+	cube->SetShader(textureShader);
 
 	gameObjects.push_back(cube);
 
@@ -93,7 +103,7 @@ void display()
 	mvp *= glm::lookAt(glm::vec3(0, 0, 2), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));					//vermenigvuldig met een lookat
 	
 	//Draw objects
-	for (GameObject *go : gameObjects)
+	for (TexturedObject *go : gameObjects)
 	{
 		go->Draw(mvp);
 	}
@@ -115,7 +125,8 @@ void keyboard(unsigned char key, int x, int y)
 	if (key == VK_ESCAPE)
 		glutLeaveMainLoop();
 
-	if (key == 'f')
+	//Old keyboard code
+	/*if (key == 'f')
 	{
 		gameObjects[0]->AddRandomTriangle();
 	}
@@ -154,7 +165,7 @@ void keyboard(unsigned char key, int x, int y)
 		{
 			gameObjects.pop_back();
 		}	
-	}
+	}*/
 }
 
 void update()
@@ -162,7 +173,7 @@ void update()
 	int time = glutGet(GLUT_ELAPSED_TIME);
 	int elapsed = time - lastTime;
 
-	for (GameObject *go : gameObjects)
+	for (TexturedObject *go : gameObjects)
 	{
 		go->Update(elapsed);
 	}

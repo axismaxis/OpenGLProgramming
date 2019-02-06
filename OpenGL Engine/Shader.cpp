@@ -4,6 +4,8 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 #include <iostream>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #pragma comment(lib, "glew32.lib")
 
 Shader::Shader(const char* vsFileName, const char* fsFileName)
@@ -40,6 +42,23 @@ void Shader::Link()
 void Shader::Use()
 {
 	glUseProgram(GLProgramHandle);
+}
+
+void Shader::CreateTexture(const char* fileName, const char* textureName)
+{
+	int width, height, nrChannels;
+	unsigned char *data = stbi_load(fileName, &width, &height, &nrChannels, 0);
+
+	glGenTextures(1, &textureHandle);
+	glBindTexture(GL_TEXTURE_2D, textureHandle);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	
+	stbi_image_free(data);
+}
+
+void Shader::UseTexture(const char* textureName)
+{
+	glBindTexture(GL_TEXTURE_2D, textureHandle);
 }
 
 void Shader::CreateUniform(const char* uniformName)

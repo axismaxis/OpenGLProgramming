@@ -15,6 +15,8 @@ public:
 	void SetUniformMatrix4fv(const char* uniformName, const glm::mat4 uniformValue);
 	void SetUniformFloat(const char* uniformName, const float uniformValue);
 
+	void CreateTexture(const char* fileName, const char* textureName);
+	void UseTexture(const char* textureName);
 private:
 	void CheckShaderErrors(unsigned int shaderId);
 	void GLAPIENTRY OnDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
@@ -23,6 +25,10 @@ private:
 
 	std::map<const char*, GLuint> UniformMap;
 
+	/*
+	TEMP
+	*/
+	GLuint textureHandle;
 
 	GLuint modelViewUniformHandle;
 	GLuint timeUniformHandle;
