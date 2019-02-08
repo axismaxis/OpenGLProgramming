@@ -15,34 +15,31 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\GameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OpenGLEngine.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Shader.cpp">
+    <ClCompile Include="src\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject.cpp">
+    <ClCompile Include="src\ObjModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Headers\TexturedObject.cpp">
+    <ClCompile Include="src\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="simple.vs" />
-    <None Include="simple.fs" />
-    <None Include="grayscale.fs" />
-    <None Include="Headers\textureshader.vs" />
-    <None Include="Headers\textureshader.fs" />
+    <None Include="res\shaders\grayscale.fs" />
+    <None Include="res\shaders\simple.fs" />
+    <None Include="res\shaders\simple.vs" />
+    <None Include="res\shaders\textureshader.fs" />
+    <None Include="res\shaders\textureshader.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\OpenGLEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Headers\CSVReader.h">
@@ -57,7 +54,10 @@
     <ClInclude Include="Headers\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\TexturedObject.h">
+    <ClInclude Include="Headers\ObjModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

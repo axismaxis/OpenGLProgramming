@@ -2,6 +2,7 @@
 #include<glm.hpp>
 #include<Shader.h>
 #include<Vertex.h>
+#include<ObjModel.h>
 
 class GameObject
 {
@@ -11,22 +12,13 @@ public:
 
 	void SetShader(Shader *shader);
 	void Update(float fElapsedTime);
-	void Draw(glm::mat4 viewProjectionMatrix);
+	void Draw(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, float fTotalTime);
 
-	void AddRandomTriangle();
-	void RemoveRandomTriangle();
-	void SetDisco(bool enable);
-	void ToggleDisco();
 private:
-	Vertex *vertices = nullptr;
 	Shader* ObjectShader;
+	ObjModel *mesh;
 
 	glm::vec3 Position;
 	float rotation = 0;
 	float rotationSpeed = 0;
-	bool disco = false;
-
-	int vertexAmount = 9;
-	
-	void GenerateRandomVertices();
 };

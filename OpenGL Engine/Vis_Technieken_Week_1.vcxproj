@@ -81,26 +81,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="Headers\TexturedObject.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="OpenGLEngine.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\GameObject.cpp" />
+    <ClCompile Include="src\ObjModel.cpp" />
+    <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="grayscale.fs" />
-    <None Include="Headers\textureshader.fs" />
-    <None Include="Headers\textureshader.vs" />
-    <None Include="simple.fs" />
-    <None Include="simple.vs" />
+    <None Include="res\shaders\grayscale.fs" />
+    <None Include="res\shaders\textureshader.fs" />
+    <None Include="res\shaders\textureshader.vs" />
+    <None Include="res\shaders\simple.fs" />
+    <None Include="res\shaders\simple.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\CSVReader.h" />
     <ClInclude Include="Headers\GameObject.h" />
-    <ClInclude Include="Headers\OpenGLEngine.h" />
+    <ClInclude Include="Headers\ObjModel.h" />
     <ClInclude Include="Headers\Shader.h" />
     <ClInclude Include="Headers\stb_image.h" />
-    <ClInclude Include="Headers\TexturedObject.h" />
+    <ClInclude Include="Headers\Texture.h" />
     <ClInclude Include="Headers\Vertex.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
