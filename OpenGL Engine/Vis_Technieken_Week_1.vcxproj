@@ -88,11 +88,11 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shaders\grayscale.fs" />
-    <None Include="res\shaders\textureshader.fs" />
-    <None Include="res\shaders\textureshader.vs" />
+    <None Include="res\shaders\texture.fs" />
+    <None Include="res\shaders\texture.vs" />
     <None Include="res\shaders\simple.fs" />
     <None Include="res\shaders\simple.vs" />
+    <None Include="res\shaders\toon.fs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\CSVReader.h" />

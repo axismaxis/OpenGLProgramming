@@ -11,10 +11,12 @@ uniform mat3 normalMatrix;
 
 uniform float time = 0;
 
+out vec2 texCoord;
 out vec3 normal;
 
 void main()
 {
+	texCoord = a_texcoord;
 	normal = normalMatrix * a_normal;
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(a_position.x, abs(sin(time * 3)) * a_position.y,a_position.z,1);
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(a_position,1);
 }

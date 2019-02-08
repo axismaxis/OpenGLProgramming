@@ -14,42 +14,15 @@
 //Screen size
 glm::ivec2 screenSize;
 
-//Shaders
-Shader* simpleShader;
-Shader* grayscaleShader;
-Shader* textureShader;
+//Keep count of shaders
+std::vector<Shader*> shaders;
+std::vector<Shader*>::const_iterator selectedShader;
 
 //Timing
 int lastTime;
 
 //Gameobjects
 std::vector<GameObject*> gameObjects;
-
-void checkShaderErrors(GLuint shaderId)
-{
-	GLint status;
-	glGetShaderiv(shaderId, GL_COMPILE_STATUS, &status);					//kijk of het compileren is gelukt
-	if (status == GL_FALSE)
-	{
-		int length, charsWritten;
-		glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &length);				//haal de lengte van de foutmelding op
-		char* infolog = new char[length + 1];
-		memset(infolog, 0, length + 1);
-		glGetShaderInfoLog(shaderId, length, &charsWritten, infolog);		//en haal de foutmelding zelf op
-		std::cout << "Error compiling shader:\n" << infolog << std::endl;
-		delete[] infolog;
-	}
-}
-
-
-#ifdef WIN32
-void GLAPIENTRY onDebug(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
-#else
-void onDebug(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam)
-#endif
-{
-	std::cout << message << std::endl;
-}
 
 void init()
 {
@@ -58,34 +31,47 @@ void init()
 	glEnable(GL_BLEND);
 	glClearColor(1, 0.7f, 0.3f, 1.0f);
 
+	/*
+		Create Shaders
+	*/
+
 	//Simple shader 
-	simpleShader = new Shader("res/shaders/simple.vs", "res/shaders/simple.fs");
-	simpleShader->EnableDebug(true);
+	Shader *simpleShader = new Shader("res/shaders/simple.vs", "res/shaders/simple.fs");
 
-	simpleShader->CreateUniform("modelMatrix");
-	simpleShader->CreateUniform("viewMatrix");
-	simpleShader->CreateUniform("projectionMatrix");
-	simpleShader->CreateUniform("normalMatrix");
-	simpleShader->CreateUniform("time");
-	simpleShader->CreateUniform("s_texture");
+	//Texture shader 
+	Shader *textureShader = new Shader("res/shaders/texture.vs", "res/shaders/texture.fs");
 
-	//Only grayscale colors
-	grayscaleShader = new Shader("res/shaders/simple.vs", "res/shaders/grayscale.fs");
-	grayscaleShader->EnableDebug(true);
+	//Texture lighted shader 
+	Shader *textureLightedShader = new Shader("res/shaders/textureLighted.vs", "res/shaders/textureLighted.fs");
 
-	grayscaleShader->CreateUniform("modelViewProjectionMatrix");
-	grayscaleShader->CreateUniform("time");
+	//Toon shader
+	Shader *toonShader = new Shader("res/shaders/simple.vs", "res/shaders/toon.fs");
 
-	//Create texture shader
-	textureShader = new Shader("res/shaders/textureshader.vs", "res/shaders/textureshader.fs");
-	textureShader->EnableDebug(true);
+	//Add shaders to list
+	shaders.push_back(simpleShader);
+	shaders.push_back(textureShader);
+	shaders.push_back(textureLightedShader);
+	shaders.push_back(toonShader);
 
+	//Set default uniforms that i want in all shaders
+	for (Shader *shader : shaders)
+	{
+		shader->EnableDebug(true);
 
-	textureShader->CreateUniform("modelViewProjectionMatrix");
+		shader->CreateUniform("modelMatrix");
+		shader->CreateUniform("viewMatrix");
+		shader->CreateUniform("projectionMatrix");
+		shader->CreateUniform("normalMatrix");
+		shader->CreateUniform("time");
+		shader->CreateUniform("s_texture");
+	}
+
+	//Set iterator to point at first element
+	selectedShader = shaders.begin();
 
 	//Create gameobjects
 	GameObject* cube = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f));
-	cube->SetShader(simpleShader);
+	cube->SetShader(*selectedShader);
 
 	gameObjects.push_back(cube);
 
@@ -94,6 +80,7 @@ void init()
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
 
+	
 	lastTime = glutGet(GLUT_ELAPSED_TIME);
 }
 
@@ -103,7 +90,7 @@ void display()
 
 	// Create Model view projection matrix
 	glm::mat4 projection = glm::perspective(glm::radians(70.0f), screenSize.x / (float)screenSize.y, 0.01f, 200.0f);		
-	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 50), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));					
+	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 150), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));					
 	
 	//Draw objects
 	for (GameObject *go : gameObjects)
@@ -124,50 +111,37 @@ void reshape(int newWidth, int newHeight)
 
 void keyboard(unsigned char key, int x, int y)
 {
-	if (key == VK_ESCAPE)
+	switch (key)
+	{
+	case VK_ESCAPE:
 		glutLeaveMainLoop();
-
-	//Old keyboard code
-	/*if (key == 'f')
-	{
-		gameObjects[0]->AddRandomTriangle();
-	}
-
-	if (key == 's')
-	{		
-		gameObjects[0]->RemoveRandomTriangle();
-	}
-
-	if (key == 'd')
-	{
-		gameObjects[0]->ToggleDisco();
-	}
-
-	if (key == 'q')
-	{
-		gameObjects[0]->SetShader(simpleShader);
-	}
-
-	if (key == 'w')
-	{
-		gameObjects[0]->SetShader(grayscaleShader);
-	}
-
-	if (key == 'x')
-	{
-		GameObject* cube = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f));
-		cube->SetShader(simpleShader);
-
-		gameObjects.push_back(cube);
-	}
-
-	if (key == 'z')
-	{
-		if (gameObjects.size() > 1)
+		break;
+	case 'w':
+		selectedShader++;
+		if (selectedShader == shaders.end())
 		{
-			gameObjects.pop_back();
-		}	
-	}*/
+			selectedShader = shaders.begin();
+		}
+		for (GameObject *go : gameObjects)
+		{
+			go->SetShader(*selectedShader);
+		}
+		break;
+	case 'q':
+		if (selectedShader == shaders.begin())
+		{
+			selectedShader = shaders.end() - 1;
+		}
+		else
+		{
+			selectedShader--;
+		}
+		for (GameObject *go : gameObjects)
+		{
+			go->SetShader(*selectedShader);
+		}
+		break;
+	}
 }
 
 void update()
@@ -184,9 +158,6 @@ void update()
 	lastTime = time;
 }
 
-
-
-
 int main(int argc, char* argv[])
 {
 	glutInit(&argc, argv);
@@ -202,5 +173,4 @@ int main(int argc, char* argv[])
 	init();
 	
 	glutMainLoop();
-
 }
