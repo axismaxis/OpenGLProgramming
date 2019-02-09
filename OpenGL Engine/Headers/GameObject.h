@@ -7,7 +7,7 @@
 class GameObject
 {
 public:
-	GameObject(glm::vec3 position);
+	GameObject(const char* objModelFileName, glm::vec3 position);
 	~GameObject();
 
 	void SetShader(Shader *shader);

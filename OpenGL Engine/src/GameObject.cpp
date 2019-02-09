@@ -4,12 +4,11 @@
 #include <gtc/type_ptr.hpp>
 #include <time.h>
 
-GameObject::GameObject(glm::vec3 position)
+GameObject::GameObject(const char* objModelFileName, glm::vec3 position)
 {
 	Position = position;
 	rotationSpeed = std::rand() % 100 / 100.0f;
-
-	mesh = new ObjModel("res/models/car/honda_jazz.obj");
+	mesh = new ObjModel(objModelFileName);
 }
 
 GameObject::~GameObject()
@@ -30,7 +29,7 @@ void GameObject::Update(float fElapsedTime)
 void GameObject::Draw(glm::mat4 view, glm::mat4 projection, float fTotalTime)
 {
 	//Only do these in the object
-	glm::mat4 model = glm::translate(glm::mat4(1), glm::vec3(0, -40, -1));
+	glm::mat4 model = glm::translate(glm::mat4(1), Position);
 	model = glm::rotate(model, rotation, glm::vec3(0, 1, 0));
 
 	glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(view * model)));

@@ -45,13 +45,21 @@ void init()
 	Shader *textureLightedShader = new Shader("res/shaders/textureLighted.vs", "res/shaders/textureLighted.fs");
 
 	//Toon shader
-	Shader *toonShader = new Shader("res/shaders/simple.vs", "res/shaders/toon.fs");
+	Shader *toonShader = new Shader("res/shaders/toon.vs", "res/shaders/toon.fs");
+
+	//Procedural texture shader
+	Shader *proceduralShader = new Shader("res/shaders/procedural.vs", "res/shaders/procedural.fs");
+
+	//Procedural texture shader
+	Shader *noiseShader = new Shader("res/shaders/noise.vs", "res/shaders/noise.fs");
 
 	//Add shaders to list
 	shaders.push_back(simpleShader);
 	shaders.push_back(textureShader);
 	shaders.push_back(textureLightedShader);
 	shaders.push_back(toonShader);
+	shaders.push_back(proceduralShader);
+	shaders.push_back(noiseShader);
 
 	//Set default uniforms that i want in all shaders
 	for (Shader *shader : shaders)
@@ -70,16 +78,19 @@ void init()
 	selectedShader = shaders.begin();
 
 	//Create gameobjects
-	GameObject* cube = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f));
+	GameObject* cube = new GameObject("res/models/cube/cube-textures.obj", glm::vec3(-3.5f, -2.0f, -3.0f));
 	cube->SetShader(*selectedShader);
 
+	GameObject* car = new GameObject("res/models/car/honda_jazz.obj", glm::vec3(40.0f, -40.0f, -150.0f));
+	car->SetShader(*selectedShader);
+
 	gameObjects.push_back(cube);
+	gameObjects.push_back(car);
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
-
 	
 	lastTime = glutGet(GLUT_ELAPSED_TIME);
 }
@@ -90,7 +101,7 @@ void display()
 
 	// Create Model view projection matrix
 	glm::mat4 projection = glm::perspective(glm::radians(70.0f), screenSize.x / (float)screenSize.y, 0.01f, 200.0f);		
-	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 150), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));					
+	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 2), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));					
 	
 	//Draw objects
 	for (GameObject *go : gameObjects)

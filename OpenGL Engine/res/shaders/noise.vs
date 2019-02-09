@@ -9,16 +9,10 @@ uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform mat3 normalMatrix;
 
-uniform float time = 0;
-
-out vec3 normal;
+out vec2 texCoord;
 
 void main()
 {
-	normal = normalMatrix * a_normal;
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * 
-	vec4(a_position.x, 
-		(abs(sin(time * 3)) * a_position.y) + (abs(sin(time * 3)) * 4),
-		a_position.z,
-		1);
+	texCoord = a_texcoord;
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(a_position,1);
 }

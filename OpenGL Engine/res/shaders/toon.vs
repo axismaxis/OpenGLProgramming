@@ -17,8 +17,5 @@ void main()
 {
 	normal = normalMatrix * a_normal;
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * 
-	vec4(a_position.x, 
-		(abs(sin(time * 3)) * a_position.y) + (abs(sin(time * 3)) * 4),
-		a_position.z,
-		1);
+	vec4(a_position.x, a_position.y, a_position.z, 1);
 }
