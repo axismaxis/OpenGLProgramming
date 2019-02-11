@@ -50,13 +50,17 @@ void init()
 	//Procedural texture shader
 	Shader *proceduralShader = new Shader("res/shaders/procedural.vs", "res/shaders/procedural.fs");
 
-	//Procedural texture shader
+	//Simplex noise shader
 	Shader *noiseShader = new Shader("res/shaders/noise.vs", "res/shaders/noise.fs");
 
+	//Bump map shader
+	Shader *bumpmapShader = new Shader("res/shaders/bumpmap.vs", "res/shaders/bumpmap.fs");
+
 	//Add shaders to list
+	shaders.push_back(bumpmapShader);
+	shaders.push_back(textureLightedShader);
 	shaders.push_back(simpleShader);
 	shaders.push_back(textureShader);
-	shaders.push_back(textureLightedShader);
 	shaders.push_back(toonShader);
 	shaders.push_back(proceduralShader);
 	shaders.push_back(noiseShader);
@@ -72,20 +76,21 @@ void init()
 		shader->CreateUniform("normalMatrix");
 		shader->CreateUniform("time");
 		shader->CreateUniform("s_texture");
+		shader->CreateUniform("normalMap");
 	}
 
 	//Set iterator to point at first element
 	selectedShader = shaders.begin();
 
 	//Create gameobjects
-	GameObject* cube = new GameObject("res/models/cube/cube-textures.obj", glm::vec3(-3.5f, -2.0f, -3.0f));
+	GameObject* cube = new GameObject("res/models/cube/cube-textures.obj", glm::vec3(-0.5f, -0.5f, -0.0f));
 	cube->SetShader(*selectedShader);
 
-	GameObject* car = new GameObject("res/models/car/honda_jazz.obj", glm::vec3(40.0f, -40.0f, -150.0f));
-	car->SetShader(*selectedShader);
+	//GameObject* car = new GameObject("res/models/car/honda_jazz.obj", glm::vec3(40.0f, -40.0f, -150.0f));
+	//car->SetShader(*selectedShader);
 
 	gameObjects.push_back(cube);
-	gameObjects.push_back(car);
+	//gameObjects.push_back(car);
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -150,6 +155,12 @@ void keyboard(unsigned char key, int x, int y)
 		for (GameObject *go : gameObjects)
 		{
 			go->SetShader(*selectedShader);
+		}
+		break;
+	case VK_SPACE:
+		for (GameObject *go : gameObjects)
+		{
+			go->ToggleRotate();
 		}
 		break;
 	}

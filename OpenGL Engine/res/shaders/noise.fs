@@ -99,8 +99,8 @@ float snoise(vec3 v)
 void main()
 {
 	vec4 texColor = vec4(
-		0.5+0.5*snoise(vec3(texCoord*30, 0+time)), 
-		0.5+0.5*snoise(vec3(texCoord*30, 0.333+time)), 
-		0.5+0.5*snoise(vec3(texCoord*30, 0.666+time)),1);
+		0.5+0.5*snoise(vec3(texCoord*100, time)), 
+		0.5+0.5*snoise(vec3(texCoord*100, time)), 
+		0.5+0.5*snoise(vec3(texCoord*100, time)),1);
 	gl_FragColor = texColor;
 }

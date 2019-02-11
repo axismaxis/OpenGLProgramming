@@ -23,7 +23,7 @@ void GameObject::SetShader(Shader *shader)
 
 void GameObject::Update(float fElapsedTime)
 {
-	rotation += fElapsedTime / 1000.0f * rotationSpeed;
+	if(rotating) rotation += fElapsedTime / 500.0f * rotationSpeed;
 }
 
 void GameObject::Draw(glm::mat4 view, glm::mat4 projection, float fTotalTime)
@@ -42,6 +42,12 @@ void GameObject::Draw(glm::mat4 view, glm::mat4 projection, float fTotalTime)
 	ObjectShader->SetUniformMatrix3fv("normalMatrix", normalMatrix);
 	ObjectShader->SetUniformFloat("time", fTotalTime);
 	ObjectShader->SetUniformTexture("s_texture", 0);
+	ObjectShader->SetUniformTexture("normalMap", 1);
 
 	mesh->draw();
+}
+
+void GameObject::ToggleRotate()
+{
+	rotating = !rotating;
 }

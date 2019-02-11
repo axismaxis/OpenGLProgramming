@@ -262,7 +262,7 @@ ObjModel::ObjModel(std::string fileName)
 						t[0] = texcoords[(atoi(indices[1].c_str())-1) * 2+0];
 						t[1] = texcoords[(atoi(indices[1].c_str())-1) * 2+1];
 					}
-					if(indices.size() == 3)
+					if(indices.size() == 3) //Normals
 					{
 						if( indices[1] != "")
 						{
@@ -427,6 +427,7 @@ void ObjModel::loadMaterialFile( std::string fileName, std::string dirName )
 		}
 		else if(params[0] == "map_bump")
 		{
+
 			currentMaterial->bumpMap = new Texture(dirName + "/" + params[1]);
 		}
 		else
