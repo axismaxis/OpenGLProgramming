@@ -43,6 +43,7 @@ void GameObject::Draw(glm::mat4 view, glm::mat4 projection, float fTotalTime)
 	ObjectShader->SetUniformFloat("time", fTotalTime);
 	ObjectShader->SetUniformTexture("s_texture", 0);
 	ObjectShader->SetUniformTexture("normalMap", 1);
+	ObjectShader->SetUniformTexture("secondTexture", 2);
 
 	mesh->draw();
 }

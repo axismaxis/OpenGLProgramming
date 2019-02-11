@@ -17,6 +17,7 @@ private:
 		MaterialInfo();
 		std::string name;
 		Texture* texture;
+		Texture* secondTexture;
 		Texture* bumpMap;
 
 		bool hasTexture;

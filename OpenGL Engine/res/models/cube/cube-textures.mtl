@@ -5,6 +5,7 @@ Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 map_Kd brickwall.png
 map_bump brickwall_normal.png
+second_texture second.png
 newmtl t2
 illum 4
 Kd 0.80 0.80 0.80
@@ -12,6 +13,7 @@ Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 map_Kd brickwall.png
 map_bump brickwall_normal.png
+second_texture second.png
 newmtl t3
 illum 4
 Kd 0.80 0.80 0.80
@@ -19,6 +21,7 @@ Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 map_Kd brickwall.png
 map_bump brickwall_normal.png
+second_texture second.png
 newmtl t4
 illum 4
 Kd 0.80 0.80 0.80
@@ -26,3 +29,4 @@ Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 map_Kd brickwall.png
 map_bump brickwall_normal.png
+second_texture second.png

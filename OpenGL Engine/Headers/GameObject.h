@@ -21,7 +21,7 @@ private:
 	ObjModel *mesh;
 
 	glm::vec3 Position;
-	bool rotating = true;
-	float rotation = 0;
+	bool rotating = false;
+	float rotation = 3.14f * 1.75f;
 	float rotationSpeed = 0;
 };

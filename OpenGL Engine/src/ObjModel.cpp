@@ -295,10 +295,10 @@ ObjModel::ObjModel(std::string fileName)
 		else if(params[0] == "s")
 		{
 		}
-        else if(params[0] == "mtllib")
-        {
-            loadMaterialFile(dirName + "/" + params[1], dirName);
-        }
+		else if(params[0] == "mtllib")
+		{
+			loadMaterialFile(dirName + "/" + params[1], dirName);
+		}
 		else if(params[0] == "usemtl")
 		{
 			if(currentGroup->end != -1)
@@ -327,24 +327,24 @@ ObjModel::ObjModel(std::string fileName)
 	groups.push_back(currentGroup);
 
 
-    glGenVertexArrays(1, &_vertexArray);
-    glBindVertexArray(_vertexArray);
-        
-    GLuint _vertexBuffer;
-    glGenBuffers(1, &_vertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, finalVertices.size()*sizeof(GLfloat), &finalVertices[0], GL_STATIC_DRAW);
-        
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 48, BUFFER_OFFSET(0));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 48, BUFFER_OFFSET(12));
+	glGenVertexArrays(1, &_vertexArray);
+	glBindVertexArray(_vertexArray);
+		
+	GLuint _vertexBuffer;
+	glGenBuffers(1, &_vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, finalVertices.size()*sizeof(GLfloat), &finalVertices[0], GL_STATIC_DRAW);
+		
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 48, BUFFER_OFFSET(0));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 48, BUFFER_OFFSET(12));
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 48, BUFFER_OFFSET(24));
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 48, BUFFER_OFFSET(32));
-        
-    glBindVertexArray(0);        
+		
+	glBindVertexArray(0);        
 
 
 }
@@ -359,7 +359,7 @@ ObjModel::~ObjModel(void)
 
 void ObjModel::draw()
 {
-    glBindVertexArray(_vertexArray);
+	glBindVertexArray(_vertexArray);
 	for(size_t i = 0; i < groups.size(); i++)
 	{
 		ObjGroup* group = groups[i];
@@ -373,6 +373,11 @@ void ObjModel::draw()
 		{
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, material->bumpMap->textureId);
+		}
+		if (material->secondTexture != NULL)
+		{
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, material->secondTexture->textureId);
 		}
 		
 		glDrawArrays(GL_TRIANGLES, group->start, group->end - group->start);
@@ -427,11 +432,16 @@ void ObjModel::loadMaterialFile( std::string fileName, std::string dirName )
 		}
 		else if(params[0] == "map_bump")
 		{
-
 			currentMaterial->bumpMap = new Texture(dirName + "/" + params[1]);
 		}
+		else if (params[0] == "second_texture")
+		{
+			currentMaterial->secondTexture = new Texture(dirName + "/" + params[1]);
+		}
 		else
-			std::cout<<"Didn't parse "<<params[0]<<" in material file"<<std::endl;
+		{
+			std::cout << "Didn't parse " << params[0] << " in material file" << std::endl;
+		}
 	}
 	if(currentMaterial != NULL)
 		materials.push_back(currentMaterial);
@@ -441,6 +451,7 @@ void ObjModel::loadMaterialFile( std::string fileName, std::string dirName )
 ObjModel::MaterialInfo::MaterialInfo()
 {
 	texture = NULL;
+	secondTexture = NULL;
 	bumpMap = NULL;
 	hasTexture = false;
 }

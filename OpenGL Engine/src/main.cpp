@@ -9,12 +9,15 @@
 #include <Vertex.h>
 #include <GameObject.h>
 #include <vector>
+#include <CubeMap.h>
 #pragma comment(lib, "glew32.lib")
 
 //Screen size
 glm::ivec2 screenSize;
 
 //Keep count of shaders
+CubeMap *skybox;
+Shader* cubemapShader;
 std::vector<Shader*> shaders;
 std::vector<Shader*>::const_iterator selectedShader;
 
@@ -56,9 +59,13 @@ void init()
 	//Bump map shader
 	Shader *bumpmapShader = new Shader("res/shaders/bumpmap.vs", "res/shaders/bumpmap.fs");
 
+	//Multitexture Shader
+	Shader *multitextureShader = new Shader("res/shaders/multitexture.vs", "res/shaders/multitexture.fs");
+
 	//Add shaders to list
 	shaders.push_back(bumpmapShader);
 	shaders.push_back(textureLightedShader);
+	shaders.push_back(multitextureShader);
 	shaders.push_back(simpleShader);
 	shaders.push_back(textureShader);
 	shaders.push_back(toonShader);
@@ -77,10 +84,25 @@ void init()
 		shader->CreateUniform("time");
 		shader->CreateUniform("s_texture");
 		shader->CreateUniform("normalMap");
+		shader->CreateUniform("secondTexture");
 	}
 
 	//Set iterator to point at first element
 	selectedShader = shaders.begin();
+
+	//Create skybox cubemap
+	skybox = new CubeMap(	"res/textures/skybox1/top.jpg",
+							"res/textures/skybox1/bottom.jpg",
+							"res/textures/skybox1/left.jpg",
+							"res/textures/skybox1/right.jpg",
+							"res/textures/skybox1/front.jpg",
+							"res/textures/skybox1/back.jpg");
+
+	//CubeMap shader
+	cubemapShader = new Shader("res/shaders/cubemap.vs", "res/shaders/cubemap.fs");
+	cubemapShader->CreateUniform("viewMatrix");
+	cubemapShader->CreateUniform("projectionMatrix");
+	cubemapShader->CreateUniform("skybox");
 
 	//Create gameobjects
 	GameObject* cube = new GameObject("res/models/cube/cube-textures.obj", glm::vec3(-0.5f, -0.5f, -0.0f));
@@ -103,11 +125,24 @@ void init()
 void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	int time = glutGet(GLUT_ELAPSED_TIME);
 
 	// Create Model view projection matrix
 	glm::mat4 projection = glm::perspective(glm::radians(70.0f), screenSize.x / (float)screenSize.y, 0.01f, 200.0f);		
 	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 2), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));					
 	
+	//Draw skybox cubemap
+	glDepthMask(GL_FALSE);
+	cubemapShader->Use();
+	cubemapShader->SetUniformMatrix4fv("viewMatrix", view);
+	cubemapShader->SetUniformMatrix4fv("projectionMatrix", projection);
+	cubemapShader->SetUniformTexture("skybox", 0);
+
+	glBindVertexArray(skybox->vaoID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->textureID);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glDepthMask(GL_TRUE);
+
 	//Draw objects
 	for (GameObject *go : gameObjects)
 	{
