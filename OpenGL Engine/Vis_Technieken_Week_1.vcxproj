@@ -96,6 +96,7 @@
     <None Include="res\shaders\toon.fs" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Headers\Camera.h" />
     <ClInclude Include="Headers\CSVReader.h" />
     <ClInclude Include="Headers\CubeMap.h" />
     <ClInclude Include="Headers\GameObject.h" />

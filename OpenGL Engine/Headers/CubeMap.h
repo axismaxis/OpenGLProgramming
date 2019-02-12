@@ -5,7 +5,7 @@
 class CubeMap
 {
 public:
-	CubeMap(const char* top, const char* bottom, const char* left, const char* right, const char* front, const char* back);
+	CubeMap(const char* right, const char* left, const char* top, const char* bottom, const char* back, const char* front);
 	
 	unsigned int vaoID;
 	unsigned int textureID;

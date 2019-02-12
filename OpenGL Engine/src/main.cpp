@@ -9,11 +9,23 @@
 #include <Vertex.h>
 #include <GameObject.h>
 #include <vector>
-#include <CubeMap.h>
+#include "CubeMap.h"
+#include "Camera.h"
 #pragma comment(lib, "glew32.lib")
+
+MovementStates movementState = IDLE;
 
 //Screen size
 glm::ivec2 screenSize;
+
+// camera
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+float lastX = (float)screenSize.x / 2.0;
+float lastY = (float)screenSize.y / 2.0;
+bool firstMouse = true;
+
+//Input manager
+bool keysPressed[5000];
 
 //Keep count of shaders
 CubeMap *skybox;
@@ -22,7 +34,7 @@ std::vector<Shader*> shaders;
 std::vector<Shader*>::const_iterator selectedShader;
 
 //Timing
-int lastTime;
+int lastTime = 0;
 
 //Gameobjects
 std::vector<GameObject*> gameObjects;
@@ -91,12 +103,12 @@ void init()
 	selectedShader = shaders.begin();
 
 	//Create skybox cubemap
-	skybox = new CubeMap(	"res/textures/skybox1/top.jpg",
-							"res/textures/skybox1/bottom.jpg",
+	skybox = new CubeMap(	"res/textures/skybox1/right.jpg",
 							"res/textures/skybox1/left.jpg",
-							"res/textures/skybox1/right.jpg",
-							"res/textures/skybox1/front.jpg",
-							"res/textures/skybox1/back.jpg");
+							"res/textures/skybox1/top.jpg",
+							"res/textures/skybox1/bottom.jpg",
+							"res/textures/skybox1/back.jpg",
+							"res/textures/skybox1/front.jpg");
 
 	//CubeMap shader
 	cubemapShader = new Shader("res/shaders/cubemap.vs", "res/shaders/cubemap.fs");
@@ -119,6 +131,7 @@ void init()
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
 	
+	//glutSetCursor(GLUT_CURSOR_NONE);
 	lastTime = glutGet(GLUT_ELAPSED_TIME);
 }
 
@@ -129,25 +142,27 @@ void display()
 
 	// Create Model view projection matrix
 	glm::mat4 projection = glm::perspective(glm::radians(70.0f), screenSize.x / (float)screenSize.y, 0.01f, 200.0f);		
-	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 2), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));					
-	
-	//Draw skybox cubemap
-	glDepthMask(GL_FALSE);
-	cubemapShader->Use();
-	cubemapShader->SetUniformMatrix4fv("viewMatrix", view);
-	cubemapShader->SetUniformMatrix4fv("projectionMatrix", projection);
-	cubemapShader->SetUniformTexture("skybox", 0);
-
-	glBindVertexArray(skybox->vaoID);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->textureID);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glDepthMask(GL_TRUE);
+	glm::mat4 skyboxView = glm::mat4(glm::mat3(camera.GetViewMatrix()));
+	glm::mat4 view = camera.GetViewMatrix();
 
 	//Draw objects
 	for (GameObject *go : gameObjects)
 	{
 		go->Draw(view, projection, glutGet(GLUT_ELAPSED_TIME) / 1000.0f);
 	}
+
+	//Draw skybox cubemap
+	glDepthFunc(GL_LEQUAL);
+	cubemapShader->Use();
+	cubemapShader->SetUniformMatrix4fv("viewMatrix", skyboxView);
+	cubemapShader->SetUniformMatrix4fv("projectionMatrix", projection);
+	cubemapShader->SetUniformTexture("skybox", 0);
+	glBindVertexArray(skybox->vaoID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->textureID);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glDepthFunc(GL_LESS);
+
+	
 
 	//Swap buffer to screen
 	glutSwapBuffers();
@@ -160,14 +175,29 @@ void reshape(int newWidth, int newHeight)
 	glutPostRedisplay();
 }
 
+//Keydown events
 void keyboard(unsigned char key, int x, int y)
 {
+	keysPressed[key] = true;
+
 	switch (key)
 	{
 	case VK_ESCAPE:
 		glutLeaveMainLoop();
 		break;
 	case 'w':
+		movementState = FORWARD;
+		break;
+	case 'a':
+		movementState = LEFT;
+		break;
+	case 'd':
+		movementState = RIGHT;
+		break;
+	case 's':
+		movementState = BACKWARD;
+		break;
+	case 'e':
 		selectedShader++;
 		if (selectedShader == shaders.end())
 		{
@@ -201,14 +231,53 @@ void keyboard(unsigned char key, int x, int y)
 	}
 }
 
+//Key up events
+void keyboardUp(unsigned char key, int x, int y)
+{
+	keysPressed[key] = false;
+
+	if (!keysPressed['w'] && !keysPressed['a'] && !keysPressed['s'] && !keysPressed['d'])
+	{
+		movementState = IDLE;
+	}
+}
+
+void mouse(int x, int y)
+{
+	if (firstMouse)
+	{
+		lastX = (float)x;
+		lastY = (float)y;
+		firstMouse = false;
+	}
+
+	float xoffset = (float)x - lastX;
+	float yoffset = lastY - (float)y; // reversed since y-coordinates go from bottom to top
+
+	lastX = (float)x;
+	lastY = (float)y;
+
+	int screenWidth = glutGet(GLUT_SCREEN_WIDTH);
+	int screenHeight = glutGet(GLUT_SCREEN_HEIGHT);
+	if (x < 10 || y > screenHeight - 10 || x > screenWidth - 10 || y < 10)
+	{
+		glutWarpPointer(screenSize.x / 2, screenSize.y / 2);
+	}
+	
+
+	camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
 void update()
 {
 	int time = glutGet(GLUT_ELAPSED_TIME);
-	int elapsed = time - lastTime;
+	int deltaTime = time - lastTime;
+
+	camera.ProcessKeyboard(movementState, deltaTime / 1000.0f);
 
 	for (GameObject *go : gameObjects)
 	{
-		go->Update(elapsed);
+		go->Update(deltaTime);
 	}
 
 	glutPostRedisplay();
@@ -225,6 +294,8 @@ int main(int argc, char* argv[])
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
+	glutKeyboardUpFunc(keyboardUp);
+	glutPassiveMotionFunc(mouse);
 	glutIdleFunc(update);
 
 	init();

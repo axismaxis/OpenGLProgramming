@@ -91,16 +91,16 @@ void CubeMap::GenerateVAO()
 		 1.0f, -1.0f,  1.0f
 	};
 
-	glGenVertexArrays(1, &vaoID);
-	glBindVertexArray(vaoID);
+	GLuint vertexVBO;
 
-	GLuint _vertexBuffer;
-	glGenBuffers(1, &_vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), 0, GL_STATIC_DRAW);
+	glGenVertexArrays(1, &vaoID);
+	glGenBuffers(1, &vertexVBO);
+	glBindVertexArray(vaoID);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 	glBindVertexArray(0);
 }
