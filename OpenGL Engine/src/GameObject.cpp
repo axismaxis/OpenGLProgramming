@@ -26,7 +26,7 @@ void GameObject::Update(float fElapsedTime)
 	if(rotating) rotation += fElapsedTime / 500.0f * rotationSpeed;
 }
 
-void GameObject::Draw(glm::mat4 view, glm::mat4 projection, float fTotalTime)
+void GameObject::Draw(glm::mat4 view, glm::mat4 projection, Camera *camera, float fTotalTime)
 {
 	//Only do these in the object
 	glm::mat4 model = glm::translate(glm::mat4(1), Position);
@@ -40,6 +40,7 @@ void GameObject::Draw(glm::mat4 view, glm::mat4 projection, float fTotalTime)
 	ObjectShader->SetUniformMatrix4fv("viewMatrix", view);
 	ObjectShader->SetUniformMatrix4fv("projectionMatrix", projection);
 	ObjectShader->SetUniformMatrix3fv("normalMatrix", normalMatrix);
+	ObjectShader->SetUniformVector3fv("cameraPos", camera->Position);
 	ObjectShader->SetUniformFloat("time", fTotalTime);
 	ObjectShader->SetUniformTexture("s_texture", 0);
 	ObjectShader->SetUniformTexture("normalMap", 1);

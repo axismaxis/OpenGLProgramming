@@ -74,7 +74,15 @@ void init()
 	//Multitexture Shader
 	Shader *multitextureShader = new Shader("res/shaders/multitexture.vs", "res/shaders/multitexture.fs");
 
+	//Reflection Shader
+	Shader *reflectionShader = new Shader("res/shaders/reflection.vs", "res/shaders/reflection.fs");
+
+	//Reflection Shader
+	Shader *refractionShader = new Shader("res/shaders/reflection.vs", "res/shaders/refraction.fs");
+
 	//Add shaders to list
+	shaders.push_back(refractionShader);
+	shaders.push_back(reflectionShader);
 	shaders.push_back(bumpmapShader);
 	shaders.push_back(textureLightedShader);
 	shaders.push_back(multitextureShader);
@@ -93,6 +101,7 @@ void init()
 		shader->CreateUniform("viewMatrix");
 		shader->CreateUniform("projectionMatrix");
 		shader->CreateUniform("normalMatrix");
+		shader->CreateUniform("cameraPos");
 		shader->CreateUniform("time");
 		shader->CreateUniform("s_texture");
 		shader->CreateUniform("normalMap");
@@ -117,14 +126,14 @@ void init()
 	cubemapShader->CreateUniform("skybox");
 
 	//Create gameobjects
-	GameObject* cube = new GameObject("res/models/cube/cube-textures.obj", glm::vec3(-0.5f, -0.5f, -0.0f));
-	cube->SetShader(*selectedShader);
+	//GameObject* cube = new GameObject("res/models/cube/cube-textures.obj", glm::vec3(-0.5f, -0.5f, -0.0f));
+	//cube->SetShader(*selectedShader);
 
-	//GameObject* car = new GameObject("res/models/car/honda_jazz.obj", glm::vec3(40.0f, -40.0f, -150.0f));
-	//car->SetShader(*selectedShader);
+	GameObject* car = new GameObject("res/models/car/honda_jazz.obj", glm::vec3(40.0f, -40.0f, -150.0f));
+	car->SetShader(*selectedShader);
 
-	gameObjects.push_back(cube);
-	//gameObjects.push_back(car);
+	//gameObjects.push_back(cube);
+	gameObjects.push_back(car);
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -148,7 +157,7 @@ void display()
 	//Draw objects
 	for (GameObject *go : gameObjects)
 	{
-		go->Draw(view, projection, glutGet(GLUT_ELAPSED_TIME) / 1000.0f);
+		go->Draw(view, projection, &camera, glutGet(GLUT_ELAPSED_TIME) / 1000.0f);
 	}
 
 	//Draw skybox cubemap

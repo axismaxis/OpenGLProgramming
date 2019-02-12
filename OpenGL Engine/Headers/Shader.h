@@ -13,6 +13,7 @@ public:
 	void CreateUniform(const char* uniformName);
 	void SetUniformMatrix4fv(const char* uniformName, const glm::mat4 uniformValue);
 	void SetUniformMatrix3fv(const char* uniformName, const glm::mat3 uniformValue);
+	void SetUniformVector3fv(const char* uniformName, const glm::vec3 uniformValue);
 	void SetUniformFloat(const char* uniformName, const float uniformValue);
 	void SetUniformTexture(const char* uniformName, const int uniformValue);
 

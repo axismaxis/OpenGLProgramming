@@ -3,6 +3,7 @@
 #include<Shader.h>
 #include<Vertex.h>
 #include<ObjModel.h>
+#include "Camera.h"
 
 class GameObject
 {
@@ -12,7 +13,7 @@ public:
 
 	void SetShader(Shader *shader);
 	void Update(float fElapsedTime);
-	void Draw(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, float fTotalTime);
+	void Draw(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, Camera *camera, float fTotalTime);
 
 	void ToggleRotate();
 

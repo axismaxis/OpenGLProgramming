@@ -77,6 +77,12 @@ void Shader::SetUniformMatrix3fv(const char* uniformName, const glm::mat3 unifor
 	glUniformMatrix3fv(uniformHandle, 1, 0, glm::value_ptr(uniformValue));
 }
 
+void Shader::SetUniformVector3fv(const char* uniformName, const glm::vec3 uniformValue)
+{
+	GLuint uniformHandle = UniformMap[uniformName];
+	glUniform3fv(uniformHandle, 1, glm::value_ptr(uniformValue));
+}
+
 void Shader::SetUniformFloat(const char* uniformName, const float uniformValue)
 {
 	GLuint uniformHandle = UniformMap[uniformName];
