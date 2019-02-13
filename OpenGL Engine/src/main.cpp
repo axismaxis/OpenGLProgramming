@@ -11,6 +11,7 @@
 #include <vector>
 #include "CubeMap.h"
 #include "Camera.h"
+#include "FBO.h"
 #pragma comment(lib, "glew32.lib")
 
 MovementStates movementState = IDLE;
@@ -29,7 +30,9 @@ bool keysPressed[5000];
 
 //Keep count of shaders
 CubeMap *skybox;
-Shader* cubemapShader;
+Shader *cubemapShader;
+FBO *fbo1;
+Shader *FBOShader;
 std::vector<Shader*> shaders;
 std::vector<Shader*>::const_iterator selectedShader;
 
@@ -125,6 +128,14 @@ void init()
 	cubemapShader->CreateUniform("projectionMatrix");
 	cubemapShader->CreateUniform("skybox");
 
+	//Post processing shaders
+	fbo1 = new FBO(2048, 2048);
+	FBOShader = new Shader("res/shaders/FBOSimple.vs", "res/shaders/FBOSimple.fs");
+	FBOShader->EnableDebug(true);
+	FBOShader->CreateUniform("time");
+	FBOShader->CreateUniform("s_texture");
+	fbo1->SetShader(FBOShader);
+
 	//Create gameobjects
 	//GameObject* cube = new GameObject("res/models/cube/cube-textures.obj", glm::vec3(-0.5f, -0.5f, -0.0f));
 	//cube->SetShader(*selectedShader);
@@ -154,6 +165,13 @@ void display()
 	glm::mat4 skyboxView = glm::mat4(glm::mat3(camera.GetViewMatrix()));
 	glm::mat4 view = camera.GetViewMatrix();
 
+	/*
+		First render to FBO
+	*/
+	/*fbo1->Bind();
+	glViewport(0, 0, 2048, 2048);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
+
 	//Draw objects
 	for (GameObject *go : gameObjects)
 	{
@@ -171,8 +189,20 @@ void display()
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glDepthFunc(GL_LESS);
 
-	
+	/*
+		Done Rendering to FBO
+	*/
+	/*if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
+	{
+		std::cout << "Framebuffer is complete" << std::endl;
+	}*/
+	/*glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, screenSize.x, screenSize.y);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
 
+	//Render FBO to screen
+	/*fbo1->Render();*/
+	
 	//Swap buffer to screen
 	glutSwapBuffers();
 }
@@ -297,6 +327,8 @@ int main(int argc, char* argv[])
 {
 	glutInit(&argc, argv);
 	glutInitWindowSize(1900, 1000);
+	screenSize.x = 1900;
+	screenSize.y = 1000;
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 	glutCreateWindow("Visualisatietechnieken");
 
