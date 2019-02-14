@@ -14,6 +14,9 @@ public:
 	int Height;
 	unsigned int FBOId;
 	unsigned int FBOTextureId;
+	unsigned int RBOId;
+
+	unsigned int QuadVAO, QuadVBO;
 
 private:
 	Shader *currentShader;

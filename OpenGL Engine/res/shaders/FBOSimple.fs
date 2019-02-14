@@ -1,12 +1,14 @@
 #version 330
-uniform sampler2D s_texture;
+uniform sampler2D screenTexture;
 uniform float time;
 
-in vec2 texCoord;
+in vec2 TexCoords;
+
+out vec4 FragColor;
 
 void main()
 {
-	vec4 color = texture2D(s_texture, texCoord);
+	vec3 color = texture(screenTexture, TexCoords).rgb;
 
-	gl_FragColor = color;
+	FragColor = vec4(color, 1.0);
 }

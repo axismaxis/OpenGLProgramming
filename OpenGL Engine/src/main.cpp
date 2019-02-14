@@ -28,13 +28,20 @@ bool firstMouse = true;
 //Input manager
 bool keysPressed[5000];
 
-//Keep count of shaders
+//Skybox variables
 CubeMap *skybox;
 Shader *cubemapShader;
+
+//Keep track of scene shaders
+std::vector<Shader*> sceneShaders;
+std::vector<Shader*>::const_iterator selectedSceneShader;
+
+//Keep track of post processing shaders
+std::vector<Shader*> PPShaders;
+std::vector<Shader*>::const_iterator selectedPPShader;
+
+//Framebuffers
 FBO *fbo1;
-Shader *FBOShader;
-std::vector<Shader*> shaders;
-std::vector<Shader*>::const_iterator selectedShader;
 
 //Timing
 int lastTime = 0;
@@ -42,17 +49,8 @@ int lastTime = 0;
 //Gameobjects
 std::vector<GameObject*> gameObjects;
 
-void init()
+void SetupSceneShaders()
 {
-	glewInit();
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glClearColor(1, 0.7f, 0.3f, 1.0f);
-
-	/*
-		Create Shaders
-	*/
-
 	//Simple shader 
 	Shader *simpleShader = new Shader("res/shaders/simple.vs", "res/shaders/simple.fs");
 
@@ -84,19 +82,19 @@ void init()
 	Shader *refractionShader = new Shader("res/shaders/reflection.vs", "res/shaders/refraction.fs");
 
 	//Add shaders to list
-	shaders.push_back(refractionShader);
-	shaders.push_back(reflectionShader);
-	shaders.push_back(bumpmapShader);
-	shaders.push_back(textureLightedShader);
-	shaders.push_back(multitextureShader);
-	shaders.push_back(simpleShader);
-	shaders.push_back(textureShader);
-	shaders.push_back(toonShader);
-	shaders.push_back(proceduralShader);
-	shaders.push_back(noiseShader);
+	sceneShaders.push_back(refractionShader);
+	sceneShaders.push_back(reflectionShader);
+	sceneShaders.push_back(bumpmapShader);
+	sceneShaders.push_back(textureLightedShader);
+	sceneShaders.push_back(multitextureShader);
+	sceneShaders.push_back(simpleShader);
+	sceneShaders.push_back(textureShader);
+	sceneShaders.push_back(toonShader);
+	sceneShaders.push_back(proceduralShader);
+	sceneShaders.push_back(noiseShader);
 
 	//Set default uniforms that i want in all shaders
-	for (Shader *shader : shaders)
+	for (Shader *shader : sceneShaders)
 	{
 		shader->EnableDebug(true);
 
@@ -112,36 +110,67 @@ void init()
 	}
 
 	//Set iterator to point at first element
-	selectedShader = shaders.begin();
+	selectedSceneShader = sceneShaders.begin();
+}
 
+void SetupSkybox()
+{
 	//Create skybox cubemap
-	skybox = new CubeMap(	"res/textures/skybox1/right.jpg",
-							"res/textures/skybox1/left.jpg",
-							"res/textures/skybox1/top.jpg",
-							"res/textures/skybox1/bottom.jpg",
-							"res/textures/skybox1/back.jpg",
-							"res/textures/skybox1/front.jpg");
+	skybox = new CubeMap("res/textures/skybox1/right.jpg",
+		"res/textures/skybox1/left.jpg",
+		"res/textures/skybox1/top.jpg",
+		"res/textures/skybox1/bottom.jpg",
+		"res/textures/skybox1/back.jpg",
+		"res/textures/skybox1/front.jpg");
 
 	//CubeMap shader
 	cubemapShader = new Shader("res/shaders/cubemap.vs", "res/shaders/cubemap.fs");
 	cubemapShader->CreateUniform("viewMatrix");
 	cubemapShader->CreateUniform("projectionMatrix");
 	cubemapShader->CreateUniform("skybox");
+}
 
-	//Post processing shaders
-	fbo1 = new FBO(2048, 2048);
-	FBOShader = new Shader("res/shaders/FBOSimple.vs", "res/shaders/FBOSimple.fs");
-	FBOShader->EnableDebug(true);
-	FBOShader->CreateUniform("time");
-	FBOShader->CreateUniform("s_texture");
-	fbo1->SetShader(FBOShader);
+void SetupFBO()
+{
+	//Create FBO for later rendering
+	//fbo1 = new FBO(3840, 2160);
+	fbo1 = new FBO(1920, 1080);
 
+	Shader *FBOSimpleShader = new Shader("res/shaders/FBOSimple.vs", "res/shaders/FBOSimple.fs");
+	Shader *FBOEdgeShader = new Shader("res/shaders/FBOEdge.vs", "res/shaders/FBOEdge.fs");
+
+	PPShaders.push_back(FBOSimpleShader);
+	PPShaders.push_back(FBOEdgeShader);
+
+	for (Shader *shader : PPShaders)
+	{
+		shader->EnableDebug(true);
+		shader->CreateUniform("time");
+		shader->CreateUniform("screenTexture");
+	}
+
+	selectedPPShader = PPShaders.begin();
+
+	fbo1->SetShader(*selectedPPShader);
+}
+
+void init()
+{
+	glewInit();
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glClearColor(1, 0.7f, 0.3f, 1.0f);
+
+	SetupSceneShaders();
+	SetupSkybox();
+	SetupFBO();
+	
 	//Create gameobjects
 	//GameObject* cube = new GameObject("res/models/cube/cube-textures.obj", glm::vec3(-0.5f, -0.5f, -0.0f));
 	//cube->SetShader(*selectedShader);
 
 	GameObject* car = new GameObject("res/models/car/honda_jazz.obj", glm::vec3(40.0f, -40.0f, -150.0f));
-	car->SetShader(*selectedShader);
+	car->SetShader(*selectedSceneShader);
 
 	//gameObjects.push_back(cube);
 	gameObjects.push_back(car);
@@ -157,7 +186,7 @@ void init()
 
 void display()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	int time = glutGet(GLUT_ELAPSED_TIME);
 
 	// Create Model view projection matrix
@@ -165,12 +194,13 @@ void display()
 	glm::mat4 skyboxView = glm::mat4(glm::mat3(camera.GetViewMatrix()));
 	glm::mat4 view = camera.GetViewMatrix();
 
-	/*
-		First render to FBO
-	*/
-	/*fbo1->Bind();
-	glViewport(0, 0, 2048, 2048);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
+	//Bind framebuffer to render to
+	fbo1->Bind();
+	glEnable(GL_DEPTH_TEST);
+
+	glViewport(0, 0, fbo1->Width, fbo1->Height);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Draw objects
 	for (GameObject *go : gameObjects)
@@ -187,21 +217,19 @@ void display()
 	glBindVertexArray(skybox->vaoID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->textureID);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
 	glDepthFunc(GL_LESS);
 
 	/*
 		Done Rendering to FBO
 	*/
-	/*if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
-	{
-		std::cout << "Framebuffer is complete" << std::endl;
-	}*/
-	/*glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDisable(GL_DEPTH_TEST);
 	glViewport(0, 0, screenSize.x, screenSize.y);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
+	glClear(GL_COLOR_BUFFER_BIT);
 
-	//Render FBO to screen
-	/*fbo1->Render();*/
+	//Render framebuffer to quad
+	fbo1->Render();
 	
 	//Swap buffer to screen
 	glutSwapBuffers();
@@ -236,29 +264,48 @@ void keyboard(unsigned char key, int x, int y)
 	case 's':
 		movementState = BACKWARD;
 		break;
-	case 'e':
-		selectedShader++;
-		if (selectedShader == shaders.end())
+	case '1':
+		if (selectedPPShader == PPShaders.begin())
 		{
-			selectedShader = shaders.begin();
-		}
-		for (GameObject *go : gameObjects)
-		{
-			go->SetShader(*selectedShader);
-		}
-		break;
-	case 'q':
-		if (selectedShader == shaders.begin())
-		{
-			selectedShader = shaders.end() - 1;
+			selectedPPShader = PPShaders.end() - 1;
 		}
 		else
 		{
-			selectedShader--;
+			selectedPPShader--;
+		}
+		fbo1->SetShader(*selectedPPShader);
+		break;
+	case '3':
+		selectedPPShader++;
+		if (selectedPPShader == PPShaders.end())
+		{
+			selectedPPShader = PPShaders.begin();
+		}
+		fbo1->SetShader(*selectedPPShader);
+		break;
+	case 'e':
+		selectedSceneShader++;
+		if (selectedSceneShader == sceneShaders.end())
+		{
+			selectedSceneShader = sceneShaders.begin();
 		}
 		for (GameObject *go : gameObjects)
 		{
-			go->SetShader(*selectedShader);
+			go->SetShader(*selectedSceneShader);
+		}
+		break;
+	case 'q':
+		if (selectedSceneShader == sceneShaders.begin())
+		{
+			selectedSceneShader = sceneShaders.end() - 1;
+		}
+		else
+		{
+			selectedSceneShader--;
+		}
+		for (GameObject *go : gameObjects)
+		{
+			go->SetShader(*selectedSceneShader);
 		}
 		break;
 	case VK_SPACE:
