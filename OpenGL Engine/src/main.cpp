@@ -138,9 +138,15 @@ void SetupFBO()
 
 	Shader *FBOSimpleShader = new Shader("res/shaders/FBOSimple.vs", "res/shaders/FBOSimple.fs");
 	Shader *FBOEdgeShader = new Shader("res/shaders/FBOEdge.vs", "res/shaders/FBOEdge.fs");
+	Shader *FBOWarpShader = new Shader("res/shaders/FBOWarp.vs", "res/shaders/FBOWarp.fs");
+	Shader *FBOSwirlShader = new Shader("res/shaders/FBOSwirl.vs", "res/shaders/FBOSwirl.fs");
+	Shader *FBOFishEyeShader = new Shader("res/shaders/FBOFishEye.vs", "res/shaders/FBOFishEye.fs");
 
 	PPShaders.push_back(FBOSimpleShader);
 	PPShaders.push_back(FBOEdgeShader);
+	PPShaders.push_back(FBOWarpShader);
+	PPShaders.push_back(FBOSwirlShader);
+	PPShaders.push_back(FBOFishEyeShader);
 
 	for (Shader *shader : PPShaders)
 	{
@@ -167,7 +173,7 @@ void init()
 	
 	//Create gameobjects
 	//GameObject* cube = new GameObject("res/models/cube/cube-textures.obj", glm::vec3(-0.5f, -0.5f, -0.0f));
-	//cube->SetShader(*selectedShader);
+	//cube->SetShader(*selectedSceneShader);
 
 	GameObject* car = new GameObject("res/models/car/honda_jazz.obj", glm::vec3(40.0f, -40.0f, -150.0f));
 	car->SetShader(*selectedSceneShader);

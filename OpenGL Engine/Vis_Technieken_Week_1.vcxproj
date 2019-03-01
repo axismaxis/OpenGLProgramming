@@ -103,6 +103,7 @@
     <ClInclude Include="Headers\CubeMap.h" />
     <ClInclude Include="Headers\FBO.h" />
     <ClInclude Include="Headers\GameObject.h" />
+    <ClInclude Include="Headers\Model.h" />
     <ClInclude Include="Headers\ObjModel.h" />
     <ClInclude Include="Headers\Shader.h" />
     <ClInclude Include="Headers\stb_image.h" />
