@@ -82,16 +82,15 @@ void SetupSceneShaders()
 	Shader *refractionShader = new Shader("res/shaders/reflection.vs", "res/shaders/refraction.fs");
 
 	//Add shaders to list
-	sceneShaders.push_back(refractionShader);
-	sceneShaders.push_back(reflectionShader);
 	sceneShaders.push_back(bumpmapShader);
 	sceneShaders.push_back(textureLightedShader);
 	sceneShaders.push_back(multitextureShader);
 	sceneShaders.push_back(simpleShader);
-	sceneShaders.push_back(textureShader);
 	sceneShaders.push_back(toonShader);
 	sceneShaders.push_back(proceduralShader);
 	sceneShaders.push_back(noiseShader);
+	sceneShaders.push_back(refractionShader);
+	sceneShaders.push_back(reflectionShader);
 
 	//Set default uniforms that i want in all shaders
 	for (Shader *shader : sceneShaders)
@@ -172,13 +171,9 @@ void init()
 	SetupFBO();
 	
 	//Create gameobjects
-	//GameObject* cube = new GameObject("res/models/cube/cube-textures.obj", glm::vec3(-0.5f, -0.5f, -0.0f));
-	//cube->SetShader(*selectedSceneShader);
-
 	GameObject* car = new GameObject("res/models/car/honda_jazz.obj", glm::vec3(40.0f, -40.0f, -150.0f));
 	car->SetShader(*selectedSceneShader);
 
-	//gameObjects.push_back(cube);
 	gameObjects.push_back(car);
 
 	glEnableVertexAttribArray(0);
@@ -220,7 +215,7 @@ void display()
 	cubemapShader->SetUniformMatrix4fv("viewMatrix", skyboxView);
 	cubemapShader->SetUniformMatrix4fv("projectionMatrix", projection);
 	cubemapShader->SetUniformTexture("skybox", 0);
-	glBindVertexArray(skybox->vaoID);
+	glBindVertexArray(skybox->vaoID); 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->textureID);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
